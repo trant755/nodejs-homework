@@ -3,6 +3,15 @@ const fs = require("fs").promises;
 
 const contactsPath = path.resolve("models/contacts.json");
 
+const newID = (contacts) => {
+  for (let index = 0; index < contacts.length; index += 1) {
+    if (Number(contacts[index].id) !== index + 1) {
+      return (index + 1).toString();
+    }
+  }
+  return (contacts.length + 1).toString();
+};
+
 const listContacts = async () => {
   try {
     const contacts = await fs.readFile(contactsPath, "utf8");
@@ -14,8 +23,8 @@ const listContacts = async () => {
 
 const getContactById = async (contactId) => {
   try {
-    const contacts = await fs.readFile(contactsPath, "utf8");
-    const foundContact = JSON.parse(contacts).find(
+    const contacts = await listContacts();
+    const foundContact = contacts.find(
       (contact) => Number(contact.id) === Number(contactId)
     );
     return foundContact;
@@ -27,12 +36,11 @@ const getContactById = async (contactId) => {
 
 const removeContact = async (contactId) => {
   try {
-    const contacts = await fs.readFile(contactsPath, "utf8");
-    const parseContacts = JSON.parse(contacts);
+    const contacts = await listContacts();
 
     const foundContact = await getContactById(contactId);
 
-    const refreshContacts = parseContacts.filter(
+    const refreshContacts = contacts.filter(
       (contact) => Number(contact.id) !== Number(contactId)
     );
 
@@ -46,26 +54,16 @@ const removeContact = async (contactId) => {
 
 const addContact = async ({ name, email, phone }) => {
   try {
-    const contacts = await fs.readFile(contactsPath, "utf8");
-    const parseContacts = JSON.parse(contacts);
-
-    const newID = () => {
-      for (let index = 0; index < parseContacts.length; index += 1) {
-        if (Number(parseContacts[index].id) !== index + 1) {
-          return (index + 1).toString();
-        }
-      }
-      return (parseContacts.length + 1).toString();
-    };
+    const contacts = await listContacts();
 
     const newContact = {
-      id: newID(),
+      id: newID(contacts),
       name,
       email,
       phone,
     };
 
-    const refreshContacts = [...parseContacts, newContact].sort(
+    const refreshContacts = [...contacts, newContact].sort(
       (a, b) => Number(a.id) - Number(b.id)
     );
 
@@ -77,22 +75,27 @@ const addContact = async ({ name, email, phone }) => {
   }
 };
 
-const updateContact = async (contactId, { name, email, phone }) => {
+const updateContact = async (contactId, body) => {
   try {
-    const contacts = await fs.readFile(contactsPath, "utf8");
-    const parseContacts = JSON.parse(contacts);
+    const contacts = await listContacts();
 
-    parseContacts.forEach((contact) => {
+    const refreshContacts = contacts.map((contact) => {
       const id = Number(contact.id);
       if (id === Number(contactId)) {
-        contact.name = name;
-        contact.email = email;
-        contact.phone = phone;
+        return {
+          ...contact,
+          ...body,
+        };
       }
+      return contact;
     });
 
-    await fs.writeFile(contactsPath, JSON.stringify(parseContacts), "utf8");
-    const newContact = await getContactById(contactId);
+    await fs.writeFile(contactsPath, JSON.stringify(refreshContacts), "utf8");
+
+    const newContact = refreshContacts.find(
+      (contact) => Number(contact.id) === Number(contactId)
+    );
+
     return newContact;
   } catch (error) {
     console.log(error);
