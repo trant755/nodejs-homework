@@ -38,7 +38,9 @@ const removeContact = async (contactId) => {
   try {
     const contacts = await listContacts();
 
-    const foundContact = await getContactById(contactId);
+    const foundContact = contacts.find(
+      (contact) => Number(contact.id) === Number(contactId)
+    );
 
     const refreshContacts = contacts.filter(
       (contact) => Number(contact.id) !== Number(contactId)
