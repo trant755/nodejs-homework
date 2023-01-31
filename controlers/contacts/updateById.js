@@ -1,4 +1,5 @@
 const Book = require("../../models/contact");
+const createError = require("http-errors");
 
 const updateById = async (req, res, next) => {
   const newContact = await Book.findByIdAndUpdate(
@@ -8,10 +9,10 @@ const updateById = async (req, res, next) => {
   );
 
   if (!newContact) {
-    const error = new Error(
+    const error = createError(
+      404,
       `Product with id=${req.params.contactId} not found`
     );
-    error.status = 404;
     throw error;
   }
 

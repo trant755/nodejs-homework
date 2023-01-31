@@ -1,13 +1,14 @@
 const Book = require("../../models/contact");
+const createError = require("http-errors");
 
 const removeById = async (req, res, next) => {
   const deleteContact = await Book.findByIdAndRemove(req.params.contactId);
 
   if (!deleteContact) {
-    const error = new Error(
+    const error = createError(
+      404,
       `Product with id=${req.params.contactId} not found`
     );
-    error.status = 404;
     throw error;
   }
 
