@@ -5,8 +5,7 @@ const isValidId = (req, res, next) => {
   const id = req.params.contactId;
 
   if (!isValidObjectId(id)) {
-    const error = createError(
-      404,
+    const error = createError.NotFound(
       `${req.params.contactId} is an incorrect ID format`
     );
     next(error);
