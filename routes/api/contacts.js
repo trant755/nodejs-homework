@@ -2,6 +2,7 @@ const express = require("express");
 const ctrlWrapper = require("../../helpers/ctrlWrapper");
 const { contacts: ctrl } = require("../../controlers");
 const isValidId = require("../../middlewares/isValidId");
+const auth = require("../../middlewares/auth");
 
 const {
   addContactValidation,
@@ -11,11 +12,11 @@ const {
 
 const router = express.Router();
 
-router.get("/", ctrlWrapper(ctrl.getAll));
+router.get("/", auth, ctrlWrapper(ctrl.getAll));
 
 router.get("/:contactId", isValidId, ctrlWrapper(ctrl.getById));
 
-router.post("/", addContactValidation, ctrlWrapper(ctrl.add));
+router.post("/", auth, addContactValidation, ctrlWrapper(ctrl.add));
 
 router.put(
   "/:contactId",
