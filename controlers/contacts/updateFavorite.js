@@ -2,9 +2,12 @@ const Contact = require("../../models/contact");
 const createError = require("http-errors");
 
 const updateFavorite = async (req, res, next) => {
-  console.log(req.body);
-  const newContact = await Contact.findByIdAndUpdate(
-    req.params.contactId,
+  const { _id: owner } = req.user;
+  const newContact = await Contact.findOneAndUpdate(
+    {
+      _id: req.params.contactId,
+      owner,
+    },
     req.body,
     { new: true }
   );

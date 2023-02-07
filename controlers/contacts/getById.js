@@ -2,7 +2,11 @@ const Contact = require("../../models/contact");
 const createError = require("http-errors");
 
 const getById = async (req, res, next) => {
-  const foundContact = await Contact.findById(req.params.contactId);
+  const { _id: owner } = req.user;
+  const foundContact = await Contact.findOne({
+    _id: req.params.contactId,
+    owner,
+  });
   if (!foundContact) {
     const error = createError.NotFound(
       `Product with id=${req.params.contactId} not found`
