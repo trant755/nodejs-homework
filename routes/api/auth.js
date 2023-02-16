@@ -3,6 +3,7 @@ const express = require("express");
 const ctrlWrapper = require("../../helpers/ctrlWrapper");
 const { auth: ctrl } = require("../../controlers");
 const auth = require("../../middlewares/auth");
+const upload = require("../../middlewares/upload");
 const {
   signupUserValidation,
   loginUserValidation,
@@ -24,6 +25,13 @@ router.patch(
   auth,
   updateSubscriptionValidation,
   ctrlWrapper(ctrl.updateSubscription)
+);
+
+router.patch(
+  "/avatars",
+  auth,
+  upload.single("avatar"),
+  ctrlWrapper(ctrl.updateAvatar)
 );
 
 module.exports = router;
