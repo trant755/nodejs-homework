@@ -8,6 +8,7 @@ const {
   signupUserValidation,
   loginUserValidation,
   updateSubscriptionValidation,
+  verifyEmailValidation,
 } = require("../../middlewares/userValidationMiddleware");
 
 const router = express.Router();
@@ -32,6 +33,14 @@ router.patch(
   auth,
   upload.single("avatar"),
   ctrlWrapper(ctrl.updateAvatar)
+);
+
+router.get("/verify/:verificationToken", ctrlWrapper(ctrl.verifyEmail));
+
+router.post(
+  "/verify",
+  verifyEmailValidation,
+  ctrlWrapper(ctrl.resendVerifyEmail)
 );
 
 module.exports = router;

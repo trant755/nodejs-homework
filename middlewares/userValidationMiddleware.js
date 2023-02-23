@@ -15,6 +15,10 @@ const updateSubscriptionSchema = Joi.object({
   subscription: Joi.string().valid("starter", "pro", "business").required(),
 });
 
+const verifyEmailSchema = Joi.object({
+  email: Joi.string().email().required(),
+});
+
 module.exports = {
   signupUserValidation: (req, res, next) => {
     const validation = signupUserSchema.validate(req.body);
@@ -41,6 +45,20 @@ module.exports = {
 
   updateSubscriptionValidation: (req, res, next) => {
     const validation = updateSubscriptionSchema.validate(req.body);
+
+    if (validation.error?.details[0].type === "any.required") {
+      return res.status(400).json({ message: "missing field favorite" });
+    }
+
+    if (validation.error) {
+      console.log(validation.error);
+      return res.status(400).json(validation.error.details[0].message);
+    }
+    next();
+  },
+
+  verifyEmailValidation: (req, res, next) => {
+    const validation = verifyEmailSchema.validate(req.body);
 
     if (validation.error?.details[0].type === "any.required") {
       return res.status(400).json({ message: "missing field favorite" });
